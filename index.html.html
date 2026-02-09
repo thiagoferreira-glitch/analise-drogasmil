@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise Drogasmil - RankMyApp</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .header h1 { color: #667eea; font-size: 2em; margin-bottom: 5px; }
+        .header p { color: #666; font-size: 1.1em; }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab {
+            background: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .tab:hover { transform: translateY(-2px); }
+        .tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            display: none;
+        }
+        .content.active { display: block; }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .metric {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .metric-label { font-size: 0.85em; opacity: 0.9; margin-bottom: 8px; }
+        .metric-value { font-size: 2.5em; font-weight: bold; }
+        .metric-status { font-size: 0.9em; margin-top: 8px; opacity: 0.95; }
+        .alert {
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid;
+        }
+        .alert-success { background: #d4edda; border-color: #28a745; color: #155724; }
+        .alert-danger { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .alert-warning { background: #fff3cd; border-color: #ffc107; color: #856404; }
+        .alert h3 { margin-bottom: 10px; font-size: 1.1em; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th { background: #f8f9fa; padding: 12px; text-align: left; color: #667eea; font-weight: 600; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #f8f9fa; }
+        .highlight { background: #f0f4ff; font-weight: 600; }
+        .chart-box { margin: 30px 0; }
+        .chart-title { font-size: 1.3em; font-weight: 600; color: #333; margin-bottom: 15px; }
+        .insights {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .insights h3 { margin-bottom: 15px; font-size: 1.2em; }
+        .insights ul { list-style: none; padding: 0; }
+        .insights li { padding: 8px 0; padding-left: 20px; position: relative; }
+        .insights li:before { content: "→"; position: absolute; left: 0; font-weight: bold; }
+        .keywords { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin: 20px 0; }
+        .keyword { background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #667eea; }
+        .keyword-term { font-weight: 600; color: #667eea; margin-bottom: 5px; }
+        .keyword-pos { font-size: 1.5em; font-weight: bold; color: #333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 Análise Mobile Intelligence - Drogasmil</h1>
+            <p>Período: Janeiro 2026 | RankMyApp</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="openTab(event, 'overview')">📊 Overview</button>
+            <button class="tab" onclick="openTab(event, 'engagement')">👥 Engajamento</button>
+            <button class="tab" onclick="openTab(event, 'competitors')">⚔️ Concorrentes</button>
+            <button class="tab" onclick="openTab(event, 'keywords')">🔑 Keywords</button>
+            <button class="tab" onclick="openTab(event, 'reviews')">⭐ Reviews</button>
+            <button class="tab" onclick="openTab(event, 'action')">🚀 Plano de Ação</button>
+        </div>
+
+        <div id="overview" class="content active">
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-label">RANKING</div>
+                    <div class="metric-value">#189</div>
+                    <div class="metric-status">Saúde e Fitness</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">AVALIAÇÃO</div>
+                    <div class="metric-value">4.83</div>
+                    <div class="metric-status">⭐⭐⭐⭐⭐</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">REVIEWS</div>
+                    <div class="metric-value">429</div>
+                    <div class="metric-status">Volume limitado</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">SCREENSHOTS</div>
+                    <div class="metric-value">5</div>
+                    <div class="metric-status">Abaixo da média</div>
+                </div>
+            </div>
+
+            <div class="alert alert-danger">
+                <h3>⚠️ Desafio Crítico de Visibilidade</h3>
+                <p>Posição #189 em Saúde e Fitness limita fortemente a descoberta orgânica. Concorrentes ocupam Top 15.</p>
+            </div>
+
+            <div class="alert alert-success">
+                <h3>✅ Ponto Forte: Excelente Reputação</h3>
+                <p>Rating 4.83 está próximo dos líderes (4.73-4.86). Alta satisfação dos usuários atuais.</p>
+            </div>
+
+            <div class="chart-box">
+                <div class="chart-title">Evolução - Últimos 30 Dias</div>
+                <canvas id="chart1"></canvas>
+            </div>
+
+            <div class="insights">
+                <h3>🎯 Diagnóstico Principal</h3>
+                <ul>
+                    <li>Produto de qualidade comprovada (4.83), mas desafio de escala</li>
+                    <li>Gap crítico: apenas 429 reviews vs 19K-44K dos concorrentes</li>
+                    <li>Posição #189 limita severamente aquisição orgânica</li>
+                    <li>Compete com gigantes: Drogasil/Raia, Pague Menos, DPSP</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="engagement" class="content">
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-label">DAU</div>
+                    <div class="metric-value">3.7K</div>
+                    <div class="metric-status">+18% crescimento</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">MAU</div>
+                    <div class="metric-value">27.1K</div>
+                    <div class="metric-status">Base em expansão</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">STICKINESS</div>
+                    <div class="metric-value">14%</div>
+                    <div class="metric-status">Padrão do segmento</div>
+                </div>
+            </div>
+
+            <div class="alert alert-warning">
+                <h3>📊 Análise de Comportamento</h3>
+                <p><strong>Stickiness de 14%</strong> está alinhado ao padrão farmacêutico, mas DAU de 3.7K é menor que concorrentes (100K+). Crescimento de +18% é positivo, porém escala limitada reduz potencial.</p>
+            </div>
+
+            <div class="chart-box">
+                <div class="chart-title">Comparativo de Engajamento</div>
+                <canvas id="chart2"></canvas>
+            </div>
+
+            <div class="insights">
+                <h3>📈 Oportunidades</h3>
+                <ul>
+                    <li>Fortalecer jornadas recorrentes: recompra, lembretes, fidelidade</li>
+                    <li>Ampliar aquisição para elevar DAU</li>
+                    <li>Explorar vantagens regionais</li>
+                    <li>Features que incentivem visitas diárias</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="competitors" class="content">
+            <div class="chart-title">Análise Comparativa</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>App</th>
+                        <th>Ranking</th>
+                        <th>Avaliação</th>
+                        <th>Reviews</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="highlight">
+                        <td><strong>Drogasmil</strong></td>
+                        <td>#189</td>
+                        <td>4.83 ⭐</td>
+                        <td>429</td>
+                    </tr>
+                    <tr>
+                        <td>Drogasil/Raia</td>
+                        <td>Top 15</td>
+                        <td>4.73 ⭐</td>
+                        <td>44.000+</td>
+                    </tr>
+                    <tr>
+                        <td>Pague Menos</td>
+                        <td>Top 15</td>
+                        <td>4.86 ⭐</td>
+                        <td>19.000+</td>
+                    </tr>
+                    <tr>
+                        <td>Drogaria SP</td>
+                        <td>Top 15</td>
+                        <td>4.75 ⭐</td>
+                        <td>25.000+</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="chart-box">
+                <div class="chart-title">Volume de Reviews</div>
+                <canvas id="chart3"></canvas>
+            </div>
+
+            <div class="alert alert-danger">
+                <h3>🎯 Gap Competitivo</h3>
+                <p><strong>Volume de reviews 43-102x menor</strong> que concorrentes. Apesar da excelente avaliação (4.83), baixa quantidade limita descoberta orgânica.</p>
+            </div>
+
+            <div class="insights">
+                <h3>⚔️ Estratégia</h3>
+                <ul>
+                    <li>Diferencial não é qualidade, mas escala e visibilidade</li>
+                    <li>Concorrentes dominam por logística + integração loja-app</li>
+                    <li>Oportunidade: nichos regionais</li>
+                    <li>Urgente: ampliar geração contínua de reviews</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="keywords" class="content">
+            <div class="chart-title">🎯 Posicionamento em Keywords</div>
+            <div class="keywords">
+                <div class="keyword">
+                    <div class="keyword-term">farmácia perto de mim</div>
+                    <div class="keyword-pos">Posição Média</div>
+                </div>
+                <div class="keyword">
+                    <div class="keyword-term">drogaria online</div>
+                    <div class="keyword-pos">Posição Média</div>
+                </div>
+                <div class="keyword">
+                    <div class="keyword-term">farmácia online</div>
+                    <div class="keyword-pos">Posição Baixa</div>
+                </div>
+                <div class="keyword">
+                    <div class="keyword-term">farmácias</div>
+                    <div class="keyword-pos">Posição Baixa</div>
+                </div>
+                <div class="keyword">
+                    <div class="keyword-term">app farmácia</div>
+                    <div class="keyword-pos">Oportunidade</div>
+                </div>
+                <div class="keyword">
+                    <div class="keyword-term">remédio delivery</div>
+                    <div class="keyword-pos">Não explorado</div>
+                </div>
+            </div>
+
+            <div class="alert alert-warning">
+                <h3>🔍 Diagnóstico ASO</h3>
+                <p>App aparece em termos relevantes mas em posições intermediárias. Em keywords de alto volume, perde para players consolidados. Maioria dos termos fora da 1ª página.</p>
+            </div>
+
+            <div class="insights">
+                <h3>🚀 Estratégia ASO</h3>
+                <ul>
+                    <li>Focar em keywords de cauda longa</li>
+                    <li>Otimizar título e descrição</li>
+                    <li>Explorar diferenciais regionais</li>
+                    <li>Ganho rápido com otimizações direcionadas</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="reviews" class="content">
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-label">POSITIVO</div>
+                    <div class="metric-value">85%</div>
+                    <div class="metric-status">Alta satisfação</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">NEUTRO</div>
+                    <div class="metric-value">10%</div>
+                    <div class="metric-status">Baixo volume</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">NEGATIVO</div>
+                    <div class="metric-value">5%</div>
+                    <div class="metric-status">Mínimo</div>
+                </div>
+            </div>
+
+            <div class="chart-box">
+                <div class="chart-title">Distribuição de Avaliações</div>
+                <canvas id="chart4"></canvas>
+            </div>
+
+            <div class="alert alert-warning">
+                <h3>📊 Curva de Avaliações</h3>
+                <p>Oscilações frequentes indicam baixo volume diário. Poucas avaliações negativas impactam a nota rapidamente, criando instabilidade.</p>
+            </div>
+
+            <div class="chart-title">☁️ Palavras Mais Mencionadas</div>
+            <div style="padding: 30px; text-align: center; line-height: 2;">
+                <span style="font-size: 2.5em; color: #28a745; font-weight: bold;">rápido</span>
+                <span style="font-size: 2em; color: #28a745;">entrega</span>
+                <span style="font-size: 1.8em; color: #28a745;">fácil</span>
+                <span style="font-size: 2.3em; color: #28a745; font-weight: bold;">preço</span>
+                <span style="font-size: 1.6em; color: #666;">app</span>
+                <span style="font-size: 1.9em; color: #28a745;">bom</span>
+                <span style="font-size: 2em; color: #28a745;">atendimento</span>
+                <span style="font-size: 1.3em; color: #dc3545;">demora</span>
+            </div>
+
+            <div class="insights">
+                <h3>💬 Insights</h3>
+                <ul>
+                    <li>Positivos: rápido, entrega, fácil, preço, atendimento</li>
+                    <li>85% sentimento positivo, apenas 5% negativo</li>
+                    <li>Baixo volume cria volatilidade</li>
+                    <li>Ação: gatilhos automáticos pós-compra</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="action" class="content">
+            <div class="insights" style="background: linear-gradient(135deg, #11998e, #38ef7d);">
+                <h3>✅ Pontos Fortes</h3>
+                <ul>
+                    <li>Excelente reputação: 4.83 (próximo líderes)</li>
+                    <li>Alta satisfação: 85% positivo</li>
+                    <li>Crescimento: +18% DAU</li>
+                    <li>Reconhecimento em entrega e atendimento</li>
+                </ul>
+            </div>
+
+            <div class="insights" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                <h3>⚠️ Desafios Críticos</h3>
+                <ul>
+                    <li>Posição #189 vs Top 15 concorrentes</li>
+                    <li>Reviews 43-102x menor (429 vs 19K-44K)</li>
+                    <li>DAU limitado (3.7K vs 100K+)</li>
+                    <li>Apenas 5 screenshots vs 6-7</li>
+                    <li>Keywords em posições baixas</li>
+                </ul>
+            </div>
+
+            <div class="insights" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+                <h3>🚀 Plano de Ação (90 dias)</h3>
+                <ul>
+                    <li><strong>30 dias:</strong> Programa agressivo de reviews - gatilhos automáticos</li>
+                    <li><strong>30 dias:</strong> Otimizar página - 7 screenshots, título/descrição ASO</li>
+                    <li><strong>60 dias:</strong> ASO em keywords cauda longa e geo-localizadas</li>
+                    <li><strong>90 dias:</strong> Features de retenção - fidelidade, cashback</li>
+                    <li><strong>Estratégia:</strong> Explorar diferenciais regionais</li>
+                </ul>
+            </div>
+
+            <div class="insights" style="background: linear-gradient(135deg, #fa709a, #fee140);">
+                <h3>🎯 Metas 90 Dias</h3>
+                <ul>
+                    <li>Reviews: 429 → 2.000+ (+366%)</li>
+                    <li>Rating: Manter 4.8+</li>
+                    <li>Ranking: #189 → Top 100</li>
+                    <li>DAU: 3.7K → 8K+ (+116%)</li>
+                    <li>Screenshots: 5 → 7</li>
+                    <li>Keywords Top 20: 5 termos</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, content, tabs;
+            content = document.getElementsByClassName("content");
+            for (i = 0; i < content.length; i++) {
+                content[i].classList.remove("active");
+            }
+            tabs = document.getElementsByClassName("tab");
+            for (i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        new Chart(document.getElementById('chart1'), {
+            type: 'line',
+            data: {
+                labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'],
+                datasets: [{
+                    label: 'DAU',
+                    data: [3200, 3400, 3600, 3744],
+                    borderColor: '#667eea',
+                    tension: 0.4
+                }]
+            },
+            options: { responsive: true }
+        });
+
+        new Chart(document.getElementById('chart2'), {
+            type: 'bar',
+            data: {
+                labels: ['Drogasmil', 'Drogasil', 'Pague Menos', 'DPSP'],
+                datasets: [{
+                    label: 'DAU (milhares)',
+                    data: [3.7, 120, 95, 85],
+                    backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#4facfe']
+                }]
+            },
+            options: { responsive: true }
+        });
+
+        new Chart(document.getElementById('chart3'), {
+            type: 'bar',
+            data: {
+                labels: ['Drogasmil', 'Drogasil', 'Pague Menos', 'DPSP'],
+                datasets: [{
+                    label: 'Reviews',
+                    data: [429, 44000, 19000, 25000],
+                    backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#4facfe']
+                }]
+            },
+            options: { responsive: true }
+        });
+
+        new Chart(document.getElementById('chart4'), {
+            type: 'doughnut',
+            data: {
+                labels: ['5★', '4★', '3★', '2★', '1★'],
+                datasets: [{
+                    data: [75, 15, 5, 3, 2],
+                    backgroundColor: ['#28a745', '#90ee90', '#ffc107', '#ff9800', '#dc3545']
+                }]
+            },
+            options: { responsive: true }
+        });
+    </script>
+</body>
+</html>
